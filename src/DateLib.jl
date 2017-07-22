@@ -75,8 +75,9 @@ type DateClass
    DateClass(day,month,year)= DataCheck(day,month,year) ? new(day,month,year) : error("Invalid Costructor");
 end
 
-export printDate
-function printDate(inDate::DateClass)
+import Base.println;
+export println
+function println(inDate::DateClass)
 println("$(inDate.day) $(MonthMatch(inDate.month)) $(inDate.year) ")
 end
 
