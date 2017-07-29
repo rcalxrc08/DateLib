@@ -30,9 +30,8 @@ elseif(i==12)
 end
 return outString;
 end
-export DataCheck
-function DataCheck(d::Integer,m::Integer,y::Integer)
-
+#export DataCheck
+function DataCheckInternal(d::Integer,m::Integer,y::Integer)
 flag=isLeapYear(y);
 resFlag=false;
 if (d<1||d>31)
@@ -182,5 +181,20 @@ end
 return yearFrac;
 
 end
+
+
+function DataCheck{T1 <: Number,T2 <: Number,T3 <: Number}(d::T1,m::T2,y::T3)
+if !isa(d,Integer)
+	error("Day must be an Integer")
+elseif !isa(m,Integer)
+	error("Month must be an Integer")
+elseif !isa(y,Integer)
+	error("Year must be an Integer")
+end
+resFlag=DataCheckInternal(d,m,y);
+return resFlag;
+end
+
+
 
 end # module

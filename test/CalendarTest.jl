@@ -9,10 +9,24 @@ for i=1:100
 end
 println("Simple Test Passed")
 
+println("Starting Domain Test")
 for i=1:100
 	j=(i%2==0)?i-1:i;
 	@test_throws(ErrorException, DateClass(29,2,1900+j))
 end
+
+for i=0:100
+	@test_throws(ErrorException, DateClass(1,1,1900+i*1.0000001))
+end
+for i=0:11
+	@test_throws(ErrorException, DateClass(1,1+i*1.0000001,1900))
+end
+for i=0:20
+	@test_throws(ErrorException, DateClass(1+i*1.0000001,1,1900+i))
+end
+println("Domain Test Passed")
+
+println("Starting Last of February Test")
 
 @test true==isLeapYear(1904) ;
 @test true==isLeapYear(1908) ;
