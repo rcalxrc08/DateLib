@@ -161,6 +161,23 @@ elseif(convention==2)		#(ACT/360)
 elseif(convention==3)		# (ACT/365)
 	Nday=dayact(startDate,endDate);
 	yearFrac=( Nday)/365.0;	
+elseif(convention==4)		# (30/360 PSA)
+	y1=startDate.year;
+	m1=startDate.month;
+	y2=endDate.year;
+	m2=endDate.month;
+	d1=startDate.day;
+	d2=endDate.day;
+	if((startDate.day==31)||isLastOfFebruary(startDate))
+		d1=30;
+	end
+	if((startDate.day==30||isLastOfFebruary(startDate))&&endDate.day==31)
+		d2=30;
+	end
+	dy=y2-y1;
+	dm=m2-m1;
+	dd=d2-d1;
+	yearFrac=(360.0*dy+30.0*dm+dd)/360.0;
 end
 return yearFrac;
 
