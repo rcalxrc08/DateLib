@@ -11,7 +11,7 @@ println("Simple Test Passed")
 
 println("Starting Domain Test")
 for i=1:100
-	j=(i%2==0)?i-1:i;
+	j=(i%2==0) ? i-1 : i;
 	@test_throws(ErrorException, DateClass(29,2,1900+j))
 end
 
