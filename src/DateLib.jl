@@ -105,7 +105,7 @@ end
 
 export lengthMonth
 function lengthMonth(m::Integer,y::Integer)
-	return is30Month(m)?30:(m==2?isLeapYear(y)+28:31);
+	return is30Month(m) ? 30 : (m==2 ? isLeapYear(y)+28 : 31);
 end
 
 export dayact
