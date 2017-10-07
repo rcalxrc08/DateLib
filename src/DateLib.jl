@@ -1,5 +1,6 @@
 module DateLib
-
+using Iterators
+import Base.==,Base.-,Base.+,Base.println; # we must import a method to add methods (as opposed to replacing it)
 function MonthMatch(i::Integer)
 
 outString=0;
@@ -74,7 +75,6 @@ type DateClass
    DateClass(day,month,year)= DataCheck(day,month,year) ? new(day,month,year) : error("Invalid Costructor");
 end
 
-import Base.println;
 export println
 function println(inDate::DateClass)
 println("$(inDate.day) $(MonthMatch(inDate.month)) $(inDate.year) ")
@@ -108,6 +108,11 @@ function lengthMonth(m::Integer,y::Integer)
 	return is30Month(m) ? 30 : (m==2 ? isLeapYear(y)+28 : 31);
 end
 
+export isEndMonth
+function isEndMonth(inDate::DateClass)
+		return (lengthMonth(inDate.month,inDate.year)==inDate.day);
+end
+
 export dayact
 function dayact(Data1::DateClass,Data2::DateClass)
 	D1= dayNumber(Data1);
@@ -120,6 +125,10 @@ function dayact(Data1::DateClass,Data2::DateClass)
 	end
 	return dayCount;
 end
+#########OPERATORS
+==(x::DateClass, y::DateClass) = ((x.day==y.day)&&(x.month==y.month)&&(x.year==y.year))
+-(x::DateClass, y::DateClass) = dayact(y,x);
++(x::DateClass, y::Integer) = nth(iterate(addoneday,x),y+1);
 
 
 export isLastOfFebruary
@@ -182,6 +191,48 @@ return yearFrac;
 
 end
 
+export addXMonth
+function addXMonth(inDate::DateClass,shiftM::Integer=1)
+if(shiftM<0)
+	error("It is possible only to add month")
+end
+if(shiftM==0)
+	return inDate;
+end
+	d1=inDate.day;
+	m1=inDate.month;
+	y1=inDate.year;
+	shiftY=div(shiftM,12);
+	shiftM=shiftM%12;
+	if(shiftM>12-m1)
+		shiftM-=12;
+		shiftY=shiftY+1;
+	end
+	m1+=shiftM;
+	y1+=shiftY;
+	d1=d1<=lengthMonth(m1,y1)?d1:lengthMonth(m1,y1);
+	return DateClass(d1,m1,y1);
+end
+
+export addoneday;
+function addoneday(inDate::DateClass)
+
+	d=0;#inDate.day;
+	m=inDate.month;
+	y=inDate.year;
+	if(!isEndMonth(inDate))
+		d=inDate.day+1;
+	elseif(inDate.month!=12)
+		d=1;
+		m=inDate.month+1;
+	else
+		m=1;
+		d=1;
+		y=inDate.year+1;
+	end
+
+	return DateClass(d,m,y);
+end
 
 function DataCheck{T1 <: Number,T2 <: Number,T3 <: Number}(d::T1,m::T2,y::T3)
 if !isa(d,Integer)
