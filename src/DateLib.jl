@@ -1,6 +1,6 @@
 module DateLib
 using Iterators
-import Base.==,Base.-,Base.+,Base.println; # we must import a method to add methods (as opposed to replacing it)
+import Base.==,Base.-,Base.+,Base.println,Base.show,Base.display; # we must import a method to add methods (as opposed to replacing it)
 function MonthMatch(i::Integer)
 
 outString=0;
@@ -77,7 +77,17 @@ end
 
 export println
 function println(inDate::DateClass)
-println("$(inDate.day) $(MonthMatch(inDate.month)) $(inDate.year) ")
+println("$(inDate.day) $(MonthMatch(inDate.month)) $(inDate.year)")
+end
+
+export display
+function display(inDate::DateClass)
+display("$(inDate.day) $(MonthMatch(inDate.month)) $(inDate.year)")
+end
+
+export show
+function show(inDate::DateClass)
+show("$(inDate.day) $(MonthMatch(inDate.month)) $(inDate.year)")
 end
 
 export dayNumber
@@ -129,6 +139,7 @@ end
 ==(x::DateClass, y::DateClass) = ((x.day==y.day)&&(x.month==y.month)&&(x.year==y.year))
 -(x::DateClass, y::DateClass) = dayact(y,x);
 +(x::DateClass, y::Integer) = nth(iterate(addoneday,x),y+1);
+-(x::DateClass, y::Integer) = nth(iterate(suboneday,x),y+1);
 
 
 export isLastOfFebruary
@@ -186,10 +197,50 @@ elseif(convention==4)		# (30/360 PSA)
 	dm=m2-m1;
 	dd=d2-d1;
 	yearFrac=(360.0*dy+30.0*dm+dd)/360.0;
+	
+	#########
+elseif(convention==5)		#(30/360 ISDA)
+	y1=startDate.year;
+	m1=startDate.month;
+	y2=endDate.year;
+	m2=endDate.month;
+	if(startDate.day<31)
+		d1=startDate.day;
+	else
+		d1=30;
+	end
+	if ((endDate.day==31)&(d1>29))
+		d2=30;
+	else
+		d2=endDate.day;
+	end
+	yearFrac=(360.0*((y2-y1))+30.0*((m2-m1))+(d2-d1))/360.0;
+				
+elseif(convention==6)		#(30E/360)
+	y1=startDate.year;
+	m1=startDate.month;
+	y2=endDate.year;
+	m2=endDate.month;
+	d1=startDate.day;
+	d2=endDate.day;
+	if(d1==31)
+		d1=30;
+	end
+	if(d2==31)
+		d2=30;
+	end
+	dy=y2-y1;
+	dm=m2-m1;
+	dd=d2-d1;
+	yearFrac=(360.0*dy+30.0*dm+dd)/360.0;
+	
+	############
 end
 return yearFrac;
 
 end
+
+currMaxImplemented=6;
 
 export addXMonth
 function addXMonth(inDate::DateClass,shiftM::Integer=1)
@@ -230,20 +281,48 @@ function addoneday(inDate::DateClass)
 		d=1;
 		y=inDate.year+1;
 	end
+	return DateClass(d,m,y);
+end
 
+export suboneday;
+function suboneday(inDate::DateClass)
+	d=0;#inDate.day;
+	m=inDate.month;
+	y=inDate.year;
+	if(inDate.day!=1)
+		d=inDate.day-1;
+	elseif(inDate.month!=1)
+		m=inDate.month-1;
+		if(is30Month(m))
+			d=30;
+		elseif(m==2)
+		
+			if(isLeap(DateClass(1,m,y)))
+				d=29;
+			else
+				d=28;
+			end
+		else
+			d=31;
+		end
+	else
+		m=12;
+		d=31;
+		y=inDate.year-1;
+	end
 	return DateClass(d,m,y);
 end
 
 function DataCheck{T1 <: Number,T2 <: Number,T3 <: Number}(d::T1,m::T2,y::T3)
-if !isa(d,Integer)
-	error("Day must be an Integer")
-elseif !isa(m,Integer)
-	error("Month must be an Integer")
-elseif !isa(y,Integer)
-	error("Year must be an Integer")
-end
-resFlag=DataCheckInternal(d,m,y);
-return resFlag;
+	if !isa(d,Integer)
+		error("Day must be an Integer")
+	elseif !isa(m,Integer)
+		error("Month must be an Integer")
+	elseif !isa(y,Integer)
+		error("Year must be an Integer")
+	end
+	resFlag=DataCheckInternal(d,m,y);
+	return resFlag;
 end
 
 

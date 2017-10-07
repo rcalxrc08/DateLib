@@ -1,18 +1,27 @@
 using DateLib
 using Base.Test
 
-StartDate=DateClass(14,12,1992);
-EndDate=DateClass(28,2,1996);
-MatlabResults=[ 3.208219178082192;  3.205555555555556;  3.252777777777778; 3.208219178082192 ; 3.205555555555556 ]
-TestToll=1e-14;
-for i=1:length(MatlabResults)
-	@test(abs(MatlabResults[i]-yearfrac(StartDate,EndDate,i-1))<TestToll)
+function yearFractionTester(StartDate,EndDate,MatlabResults,TestToll=1e-14)
+for i=0:DateLib.currMaxImplemented
+	@test(abs(MatlabResults[i+1]-yearfrac(StartDate,EndDate,i))<TestToll)
+end
+return ;
 end
 
-EndDate=DateClass(29,2,1996);
-MatlabResults=[ 3.210958904109589; 3.208333333333334; 3.255555555555556; 3.210958904109589; 3.208333333333334 ]
-TestToll=1e-14;
-for i=1:length(MatlabResults)
-	@test(abs(MatlabResults[i]-yearfrac(StartDate,EndDate,i-1))<TestToll)
-end
+
+StartDate=DateClass(14,12,1992);
+EndDate=DateClass(28,2,1996);
+MatlabResults=[3.20821917808219;3.20555555555556;3.25277777777778;3.20821917808219;3.20555555555556;3.20555555555556;3.20555555555556;3.20821917808219;3.20821917808219;3.25277777777778;3.20821917808219;3.20555555555556;3.20765027322409];
+yearFractionTester(StartDate,EndDate,MatlabResults);
+
+EndDate2=DateClass(29,2,1996);
+MatlabResults2=[3.21095890410959;3.20833333333333;3.25555555555556;3.21095890410959;3.20833333333333;3.20833333333333;3.20833333333333;3.21095890410959;3.21095890410959;3.25555555555556;3.21095890410959;3.20833333333333;3.21038251366122];
+yearFractionTester(StartDate,EndDate2,MatlabResults2);
+
+
+
+EndDate3=DateClass(28,2,2026);
+MatlabResults3=[33.2301369863014;33.2055555555556;33.6916666666667;33.2301369863014;33.2055555555556;33.2055555555556;33.2055555555556;33.2082191780822;33.2301369863014;33.6916666666667;33.2301369863014;33.2055555555556;33.2080844374580];
+TestToll=1e-13;
+yearFractionTester(StartDate,EndDate3,MatlabResults3,TestToll);
 println("Test YearFraction Passed")
