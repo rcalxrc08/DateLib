@@ -25,7 +25,10 @@ println("Starting Last of February Test")
 
 FileLeapYears=open("LeapYears.txt");
 LeapYearStrings = readlines(FileLeapYears);
-LeapYears=parse.(Int64,LeapYearStrings);
+LeapYears=Array{Int64}(length(LeapYearStrings));
+for i=1:length(LeapYearStrings)
+	LeapYears[i]=parse(Int64,LeapYearStrings[i]);
+end
 
 ii=1;
 for i=1904:2076
